@@ -7,6 +7,7 @@
 # Output files
 # *.pdf
 # *.html
+supplementary/supplementary_material_files/
 
 # System files
 .DS_Store
