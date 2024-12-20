@@ -1,0 +1,35 @@
+mcsa_id,pdb_chain_id,name,source,family,nprot,seqid_mean,rmsd_mean,nresidues,nresidues_asite,rmsd_asite,cath_class,ec_class
+2,1btl_A,Beta-lactamase TEM,Escherichia coli,Class-A beta-lactamase family,6,0.43093333333333333,1.0443339993632343,263,6,1.7766666666666666,alpha/beta,Hydrolases
+15,1znb_A,Metallo-beta-lactamase type 2,Bacteroides fragilis,Metallo-beta-lactamase superfamily,6,0.3476666666666667,1.164067253046928,225,8,1.837,alpha/beta,Hydrolases
+71,1eug_A,Uracil-DNA glycosylase,Escherichia coli B,Uracil-DNA glycosylase (UDG) superfamily,8,0.43275,1.0767218731375825,223,4,1.4916785714285714,alpha/beta,Hydrolases
+98,1bsz_C,Peptide deformylase,Escherichia coli K-12,Polypeptide deformylase family,10,0.3652444444444444,2.150636027231224,168,7,1.4438,alpha/beta,Hydrolases
+109,1d3g_A,"Dihydroorotate dehydrogenase (quinone), mitochondrial",Homo sapiens,Dihydroorotate dehydrogenase family,4,0.4425,1.3059641169550409,359,7,2.654166666666667,alpha/beta,Oxidoreductases
+148,1onr_A,Name not found,Escherichia coli,Transaldolase family,5,0.5256,1.062983305214904,316,5,2.0889,alpha/beta,Transferases
+151,1q0n_A,2-amino-4-hydroxy-6-hydroxymethyldihydropteridine pyrophosphokinase,Escherichia coli,HPPK family,4,0.4721666666666667,1.1419346217967032,158,4,2.0735,alpha/beta,Transferases
+160,1ako_A,Exodeoxyribonuclease III,Escherichia coli K-12,DNA repair enzymes AP/ExoA family,10,0.33882222222222225,1.4862720610226272,256,7,2.626488888888889,alpha/beta,Hydrolases
+164,1ruv_A,Ribonuclease pancreatic,Bos taurus,Pancreatic ribonuclease family,5,0.4847,1.0873622535565408,123,5,1.9183,alpha/beta,Lyases
+174,9pap_A,Papain,Carica papaya,Peptidase C1 family,12,0.4339545454545454,1.0120328385559478,212,4,1.5662575757575758,alpha/beta,Hydrolases
+216,1ca2_A,Carbonic anhydrase 2,Homo sapiens,Alpha-carbonic anhydrase family,5,0.3911,1.093889211697331,256,6,2.2725,alpha/beta,Lyases
+252,1igs_A,Indole-3-glycerol phosphate synthase,Saccharolobus solfataricus,TrpC family,6,0.34786666666666666,1.7513907833842473,245,7,2.9329333333333336,alpha/beta,Lyases
+257,1xx2_A,Beta-lactamase,Enterobacter cloacae,Class-C beta-lactamase family,10,0.4539555555555555,0.9408041396832908,359,6,1.4757333333333331,alpha/beta,Hydrolases
+258,1sml_A,Metallo-beta-lactamase L1 type 3,Stenotrophomonas maltophilia,Metallo-beta-lactamase superfamily,4,0.3823333333333333,1.9727225324480464,263,7,1.7953333333333332,alpha/beta,Hydrolases
+290,1zio_A,Adenylate kinase,Geobacillus stearothermophilus,Adenylate kinase family,7,0.4732380952380952,1.1003842057396347,217,5,1.821952380952381,alpha/beta,Transferases
+328,1lbm_A,N-(5&apos,Thermotoga maritima,TrpF family,4,0.3333333333333333,1.4674981621749503,193,2,2.553166666666667,alpha/beta,Isomerases
+351,1snz_A,Galactose mutarotase,Homo sapiens,Aldose epimerase family,4,0.33,1.3634148155317856,341,3,2.65,all-beta,Isomerases
+362,1d6o_A,Peptidyl-prolyl cis-trans isomerase FKBP1A,Homo sapiens,FKBP-type PPIase family,7,0.4558571428571429,0.9210332874731684,107,6,2.302952380952381,alpha/beta,Isomerases
+376,1a4l_A,Adenosine deaminase,Mus musculus,Metallo-dependent hydrolases superfamily,4,0.4418333333333333,1.2986944304678838,349,6,2.4226666666666667,alpha/beta,Hydrolases
+394,1aj0_A,Dihydropteroate synthase,Escherichia coli,DHPS family,10,0.40068888888888887,2.0218108926536305,280,2,2.3527555555555555,alpha/beta,Transferases
+444,1cel_A,Exoglucanase 1,Trichoderma reesei,Glycosyl hydrolase 7 (cellulase C) family,6,0.4632,1.189201809080653,431,4,2.1190666666666664,all-beta,Hydrolases
+462,1pnt_A,Low molecular weight phosphotyrosine protein phosphatase,Bos taurus,Low molecular weight phosphotyrosine protein phosphatase family,6,0.37006666666666665,1.1474685944440652,155,6,1.8133333333333332,alpha/beta,Hydrolases
+467,1cv2_A,Haloalkane dehalogenase,Sphingomonas paucimobilis,Haloalkane dehalogenase family,5,0.4518,1.0300606960770546,293,5,1.8997,alpha/beta,Hydrolases
+480,1czf_A,Endopolygalacturonase II,Aspergillus niger,Glycosyl hydrolase 28 family,4,0.4405,1.046038399662153,335,6,1.8561666666666667,all-beta,Hydrolases
+597,1uch_A,Ubiquitin carboxyl-terminal hydrolase isozyme L3,Homo sapiens,Peptidase C12 family,4,0.3755,1.7605889036864142,204,4,3.1531666666666665,alpha/beta,Hydrolases
+681,1gq8_A,Pectinesterase,Daucus carota,Pectinesterase family,4,0.30633333333333335,2.875157962464551,300,5,6.677,all-beta,Hydrolases
+693,2rnf_A,Ribonuclease 4,Homo sapiens,Pancreatic ribonuclease family,7,0.3836190476190477,1.6164240631846494,120,3,2.1996190476190476,alpha/beta,Hydrolases
+749,1nml_A,No information found,Marinobacter nauticus,No information found,6,0.5624666666666667,1.9638955168148249,316,1,3.892133333333333,all-alpha,NA
+814,1glo_A,Cathepsin S,Homo sapiens,Peptidase C1 family,4,0.45766666666666667,0.7151860508102899,215,4,1.2186666666666666,alpha/beta,Hydrolases
+858,1mrq_A,Aldo-keto reductase family 1 member C1,Homo sapiens,Aldo/keto reductase family,16,0.382425,1.8827895366789815,322,4,1.7043416666666666,alpha/beta,Oxidoreductases
+877,1pbg_A,6-phospho-beta-galactosidase,Lactococcus lactis,Glycosyl hydrolase 1 family,23,0.37448616600790513,1.5170983661512636,447,2,2.4242332015810275,alpha/beta,Hydrolases
+908,1rtu_A,Ribonuclease U2,Ustilago sphaerogena,Ribonuclease U2 family,5,0.4509,1.4454540945106171,107,4,2.5478,alpha/beta,Lyases
+923,2acy_A,Acylphosphatase-1,Bos taurus,Acylphosphatase family,4,0.33766666666666667,0.994781857578509,98,2,1.291,alpha/beta,Hydrolases
+931,2pth_A,Peptidyl-tRNA hydrolase,Escherichia coli K-12,PTH family,7,0.3933333333333333,1.398602743007599,193,4,1.8515714285714289,alpha/beta,Hydrolases

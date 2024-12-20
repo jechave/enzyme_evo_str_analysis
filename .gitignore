@@ -1,0 +1,12 @@
+# R specific files
+.Rhistory
+.RData
+*.Rproj
+.Rproj.user/
+
+# Output files
+# *.pdf
+# *.html
+
+# System files
+.DS_Store
