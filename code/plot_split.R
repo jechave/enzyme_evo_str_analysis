@@ -66,7 +66,14 @@ create_panel1 <- function(plot_data, gof_data) {
     geom_line(aes(x = ref_site, y = s2, color = "s2"), linewidth = 0.6) +
     geom_label(
       aes(x = -Inf, y = Inf),
-      label = sprintf("Expl. Dev: %.2f, SC(lRMSF): %.2f, SC(d): %.2f", gof_data$dev.expl.fit12, gof_data$shapley_lrmsf, gof_data$shapley_dactive),
+      #label = sprintf("Expl. Dev: %.2f, SC(s1): %.2f, SC(s2): %.2f", gof_data$dev.expl.fit12, gof_data$shapley_lrmsf, gof_data$shapley_dactive),
+      label = as.expression(bquote(paste("Expl. Dev: ",
+                                         .(sprintf("%.2f", gof_data$dev.expl.fit12)),
+                                         ", SC(s"[1], "): ",
+                                         .(sprintf("%.2f", gof_data$shapley_lrmsf)),
+                                         ", SC(s"[2], "): ",
+                                         .(sprintf("%.2f", gof_data$shapley_dactive))
+      ))),
       hjust = -0.05, vjust = 1.1, size = 2.5,
       label.padding = unit(0.15, "lines"),
       label.r = unit(0, "lines"),
@@ -81,6 +88,12 @@ create_panel1 <- function(plot_data, gof_data) {
     scale_color_manual(values = CUSTOM_PALETTE) +
     theme(legend.position = "none", plot.title = element_text(face = "plain", color = "#4a4a4a"))
 }
+
+
+
+
+
+
 
 create_panel2 <- function(plot_data) {
 
@@ -118,21 +131,23 @@ create_panel4 <- function(data_gof) {
     geom_col(position = "stack", color = CUSTOM_PALETTE["M12"]) +
     scale_fill_manual(values = CUSTOM_PALETTE) +
     labs(x = "M-CSA ID", y = "RSC",
-         title = "Relative contrib. of flex. and dist.") +
-    theme_cowplot(font_size = 8) +  # Changed to 7 as requested
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.0, vjust = 1.0, size = 5),
-          legend.position = "none", plot.title = element_text(face = "plain", color = "#4a4a4a")) +
-    scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
-    scale_y_continuous(breaks = seq(0, 1, by = 0.2),
-                       labels = scales::number_format(accuracy = 0.1))  # One decimal place
+         title = expression("Relative contrib. of s"[1]*" and s"[2])) +
+           theme_cowplot(font_size = 8) +  # Changed to 7 as requested
+           theme(axis.text.x = element_text(angle = 90, hjust = 0.0, vjust = 1.0, size = 5),
+                 legend.position = "none", plot.title = element_text(face = "plain", color = "#4a4a4a")) +
+           scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+           scale_y_continuous(breaks = seq(0, 1, by = 0.2),
+                              labels = scales::number_format(accuracy = 0.1))  # One decimal place
 }
 
 create_panel5 <- function(data_gof) {
   p <- ggplot(data_gof, aes(x = lrmsf_sd, y = shapley_lrmsf)) +
     geom_point(color = CUSTOM_PALETTE["s1"]) +
     geom_smooth(method = "lm", se = FALSE, color = CUSTOM_PALETTE["s1"]) +
-    labs(x = "sd(lRMSF)", y = "SC(lRMSF)",
-         title = "Flexibilty contrib.") +
+    #labs(x = "sd(lRMSF)", y = "SC(s1)",
+    labs(x = "sd(lRMSF)", y = expression("SC(s"[1]*")"),
+         #title = "s1 contrib.") +
+         title = expression("s"[1]*" contrib.")) +
     theme_cowplot(font_size = 8) +
     scale_y_continuous(expand = expansion(mult = c(0.0, 0.2), add = c(0, 0)))
 
@@ -143,8 +158,10 @@ create_panel6 <- function(data_gof) {
   p <- ggplot(data_gof, aes(x = dactive_mean, y = shapley_dactive)) +
     geom_point(color = CUSTOM_PALETTE["s2"]) +
     geom_smooth(method = "lm", se = FALSE, color = CUSTOM_PALETTE["s2"]) +
-    labs(x = expression("mean(d)"), y = expression("SC(d)"),
-         title = "Distance contrib.") +
+    #labs(x = expression("mean(d)"), y = expression("SC(s2)"),
+    labs(x = "sd(lRMSF)", y = expression("SC(s"[2]*")"),
+         #title = "s2 contrib.") +
+         title = expression("s"[2]*" contrib.")) +
     theme_cowplot(font_size = 8) +
     scale_y_continuous(expand = expansion(mult = c(0.0, 0.2), add = c(0, 0)))
 
@@ -175,7 +192,8 @@ add_stats_annotation <- function(plot, x, y) {
 
 # Helper function to create the final layout
 create_layout <- function(plots, mcsa_id) {
-  main_title <- ggdraw() + draw_label("Decomposition into flexibility and distance contributions",
+  #main_title <- ggdraw() + draw_label("Decomposition into s1 and s2 contributions",
+  main_title <- ggdraw() + draw_label(expression(paste("Decomposition into s"[1], " and s"[2], " contributions")),
                                       fontface = "plain", size = 12, color = "#4a4a4a")
 
   first_row_title <- ggdraw() + draw_label(paste0("Example family: M-CSA ID = ", mcsa_id),
@@ -217,23 +235,40 @@ create_layout <- function(plots, mcsa_id) {
   legend_second_row <- ggplot(legend_data) +
     geom_line(aes(x = x, y = y, color = label), size = 1) +
     scale_color_manual(values = CUSTOM_PALETTE[c("s1", "s2")],
-                       labels = c("Flexibility contrib.", "Distance contrib.")) +
+                       labels = c("s1 contrib.", "s2 contrib.")) +
     theme_void() +
     theme(legend.position = "bottom", legend.title = element_blank(),
           legend.text = element_text(size = 8)) +
     guides(color = guide_legend(override.aes = list(size = 1)))
 
 
+  ## Only one legend
+
+  legend <- legend_first_row
+
   plot_grid(
     main_title,
     first_row_title,
     first_row_plots,
-    legend_first_row,
     ggdraw(),
     second_row_title,
     second_row_plots,
-    legend_second_row,
-    ncol = 1, rel_heights = c(0.3, 0.3, 1.5, 0.2, 0.2, 0.3, 1.5, 0.2), align = 'v'
+    legend,
+    ncol = 1, rel_heights = c(0.3, 0.3, 1.5, 0.2, 0.3, 1.5, 0.2), align = 'v'
   ) +
     theme(plot.margin = unit(c(0.25, 0.25, 0.25, 0.25), "inches"))
+
+
+  # plot_grid(
+  #   main_title,
+  #   first_row_title,
+  #   first_row_plots,
+  #   legend_first_row,
+  #   ggdraw(),
+  #   second_row_title,
+  #   second_row_plots,
+  #   legend_second_row,
+  #   ncol = 1, rel_heights = c(0.3, 0.3, 1.5, 0.2, 0.2, 0.3, 1.5, 0.2), align = 'v'
+  # ) +
+  #   theme(plot.margin = unit(c(0.25, 0.25, 0.25, 0.25), "inches"))
 }

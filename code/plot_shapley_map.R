@@ -56,8 +56,8 @@ plot_shapley_map <- function(
     xlim(xlim) +
     ylim(ylim) +
     labs(
-      x = "Shapley Contribution (lRMSF)",
-      y = "Shapley Contribution (d)",
+      x = expression("Non-functional constr. SC(s"[1]*")"),
+      y = expression("Functional constr. SC(s"[2]*")"),
       color = "Best Model"
     )
 
