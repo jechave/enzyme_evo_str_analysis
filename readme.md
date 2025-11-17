@@ -1,6 +1,10 @@
 # Reproducibility Package
 
-This repository contains the data and code to reproduce all figures and tables from our paper.
+This repository contains the data and code to reproduce all figures and tables from:
+
+**On the variation of structural divergence among residues in enzyme evolution**
+Julian Echave and Mathilde Carpentier
+bioRxiv (2024) https://doi.org/10.1101/2024.12.23.629899
 
 ## Repository Structure
 
