@@ -1,0 +1,511 @@
+---
+title: "On the variation of structural divergence among residues in enzyme evolution --- Supplement"
+author: "Julian Echave & Mathilde Carpentier"
+header-includes:
+  - \usepackage{float}
+  - \usepackage{caption}
+  - \usepackage{titlesec}
+  - \usepackage{longtable}  # Ensure longtable is included for better table formatting
+  - \usepackage{booktabs}   # For better quality table rules
+  - \usepackage{tocloft}    # For TOC leader dots
+  - \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}  # Add dots for sections
+  - \newcommand{\beginsection}{\clearpage}
+  - \renewcommand{\thefigure}{S\arabic{figure}}
+  - \renewcommand{\thetable}{S\arabic{table}}
+  - \titleformat{\section}{\normalfont\Large\bfseries}{\thesection.}{1em}{}[\vspace{-0.5\baselineskip}]
+geometry: "a4paper, margin=1in"
+output:
+  pdf_document:
+    fig_width: 6.5
+    fig_height: 7.4
+    keep_tex: yes  # Keep the LaTeX file for troubleshooting
+    extra_dependencies: ["longtable", "booktabs"]  # Ensure dependencies are recognized
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      fig.width = 6.5, fig.height = 7.4, fig.align = 'center')
+library(dplyr)
+library(tidyr)
+library(readr)
+library(here)
+library(knitr)
+
+## Input data for tables only
+## Dataset
+dataset <- read_csv(here("data", "final_dataset_ca_ref.csv")) %>%
+  mutate(mcsa_id = as.character(mcsa_id))
+
+## Goodness of fit of scam models
+data_gof <- read_csv(here("data", "final_dataset_gof_ca_ref.csv")) %>%
+  mutate(mcsa_id = as.character(mcsa_id))
+
+## Some dataset entry properties
+dataset_table <- read_csv(here("data", "final_dataset_table.csv"))
+
+```
+
+\tableofcontents
+\setcounter{tocdepth}{2}
+
+\beginsection
+# Dataset 
+\nopagebreak
+
+
+```{r, eval = TRUE}
+library(kableExtra)
+
+dataset_table %>% 
+  mutate(across(where(is.double), ~ round(., 2))) %>% 
+  mutate(seqid_mean = round(seqid_mean * 100, 0)) %>% 
+  select(mcsa_id, pdb_chain_id, name, source, family) %>% 
+  kable(
+    col.names = c("M-CSA", "PDB", "Name", "Source", "Family"),
+    caption = "Dataset entries and reference protein",
+    format = "latex",
+    booktabs = TRUE,
+    linesep = ""
+  ) %>% 
+  kable_styling(
+    font_size = 8,
+    latex_options = c("scale_down", "hold_position")  # Using hold_position instead
+  ) %>%
+  column_spec(3:5, width = "4cm")
+```
+
+\clearpage
+```{r}
+library(kableExtra)
+# Second table - structural and classification information
+dataset_table %>% 
+  mutate(across(where(is.double), ~ round(., 2))) %>% 
+  mutate(seqid_mean = round(seqid_mean * 100, 0)) %>% 
+  select(mcsa_id, nprot, seqid_mean, rmsd_mean, nresidues, nresidues_asite, rmsd_asite, cath_class, ec_class) %>% 
+  kable(
+    col.names = c("M-CSA", "N", "<Id%>", "<RMSD>", "Length", "AS size", "AS RMSD", "CATH", "EC"),
+    caption = "Dataset properties",
+    format = "latex",
+    booktabs = TRUE
+  ) %>% 
+  kable_styling(
+    font_size = 8,
+    latex_options = "scale_down"
+  ) %>% 
+  footnote(
+    general = "N: number of family members; <Id%>: average family seq. identity; <RMSD>: average family RMSD; Length: number of residues of reference protein; AS size: number of residues of active site; CATH: CATH class; EC: EC class",
+    general_title = "",
+    threeparttable = TRUE
+  )
+```
+
+\clearpage
+
+
+
+```{r dataset-distributions, fig.width=6.5, fig.height=9, fig.cap="Distribution of properties of dataset families."}
+knitr::include_graphics(here("supplementary/figures", "dataset_distributions.pdf"))
+```
+
+\clearpage
+
+\beginsection
+
+# Correlation between flexibility and distance
+
+The following figure shows the distribution of spearman correlations between flexibility (lRMSF) and distance to the active site (d) (panel a).
+The correlation between these variables depends on the location of the active site within the enzyme structure. In most cases active sites are located in relatively rigid regions. Therefore, as one moves away from the active site, not only distance increases but flexibility too, which originates the correlation  (panel b).
+
+```{r flex-dist-correlation, fig.width=6.5, fig.height=5.5, fig.cap="Correlation betwen flexibility and distance."}
+knitr::include_graphics(here("supplementary/figures", "flex_dist_correlation.pdf"))
+```
+
+
+\clearpage
+
+\beginsection
+
+# Model performance
+
+The following table presents the goodness-of-fit metrics for the three models tested: M\textsubscript{1} (flexibility only), M\textsubscript{2} (distance only), and M\textsubscript{12} (both predictors). For each enzyme family, we report the Akaike Information Criterion (AIC), the deviance explained, the root mean square error between observed and predicted divergence-flexibility trends (RMSE(flex)), the root mean square error between observed and predicted divergence-distance trends (RMSE(dist)), and the relative Shapley contribution of functional constraints to structural divergence (RSC(s\textsubscript{2})). Families are sorted by increasing RSC(s\textsubscript{2}).
+
+\clearpage
+
+```{r model_performance_table, results='asis'}
+# Prepare table data for Model Performance section
+table_data_gof <- data_gof %>%
+  left_join(dataset %>% select(mcsa_id, pdb_chain_id), by = "mcsa_id") %>%
+  arrange(prop_dactive) %>%
+  select(
+    mcsa_id,
+    pdb_chain_id,
+    prop_dactive,  # This is RSC(s2)
+    best_model,
+    aic.fit1, aic.fit2, aic.fit12,
+    dev.expl.fit1, dev.expl.fit2, dev.expl.fit12,
+    rmse_lrmsf.fit1, rmse_lrmsf.fit2, rmse_lrmsf.fit12,
+    rmse_dactive.fit1, rmse_dactive.fit2, rmse_dactive.fit12
+  ) %>%
+  mutate(
+    # Round values
+    prop_dactive = sprintf("%.2f", prop_dactive),
+    aic.fit1 = as.integer(round(aic.fit1)),
+    aic.fit2 = as.integer(round(aic.fit2)),
+    aic.fit12 = as.integer(round(aic.fit12)),
+    dev.expl.fit1 = sprintf("%.2f", dev.expl.fit1),
+    dev.expl.fit2 = sprintf("%.2f", dev.expl.fit2),
+    dev.expl.fit12 = sprintf("%.2f", dev.expl.fit12),
+    rmse_lrmsf.fit1 = sprintf("%.2f", rmse_lrmsf.fit1),
+    rmse_lrmsf.fit2 = sprintf("%.2f", rmse_lrmsf.fit2),
+    rmse_lrmsf.fit12 = sprintf("%.2f", rmse_lrmsf.fit12),
+    rmse_dactive.fit1 = sprintf("%.2f", rmse_dactive.fit1),
+    rmse_dactive.fit2 = sprintf("%.2f", rmse_dactive.fit2),
+    rmse_dactive.fit12 = sprintf("%.2f", rmse_dactive.fit12),
+    # Format best model
+    best_model = case_when(
+      best_model == "fit1" ~ "M\\textsubscript{1}",
+      best_model == "fit2" ~ "M\\textsubscript{2}",
+      best_model == "fit12" ~ "M\\textsubscript{12}",
+      TRUE ~ best_model
+    )
+  )
+
+# Generate LaTeX table
+cat("\\begin{table}[htbp]\n")
+cat("\\caption{Variation of model performance across all families}\n")
+cat("\\small\n")
+cat("\\centering\n")
+cat("\\setlength{\\tabcolsep}{3pt}\n")
+cat("\\renewcommand{\\arraystretch}{1.2}\n")
+cat("\\begin{tabular}{llcr@{\\hspace{15pt}}rrr@{\\hspace{15pt}}rrr@{\\hspace{15pt}}rrr@{\\hspace{15pt}}rrr}\n")
+cat("\\toprule\n")
+cat("& & & & \\multicolumn{3}{c}{AIC} & \\multicolumn{3}{c}{Expl. Dev.} & \\multicolumn{3}{c}{RMSE(flex)} & \\multicolumn{3}{c}{RMSE(dist)} \\\\\n")
+cat("\\cmidrule(lr){5-7} \\cmidrule(lr){8-10} \\cmidrule(lr){11-13} \\cmidrule(lr){14-16}\n")
+cat("M-CSA & PDB & RSC(s\\textsubscript{2}) & Best & M\\textsubscript{1} & M\\textsubscript{2} & M\\textsubscript{12} & M\\textsubscript{1} & M\\textsubscript{2} & M\\textsubscript{12} & M\\textsubscript{1} & M\\textsubscript{2} & M\\textsubscript{12} & M\\textsubscript{1} & M\\textsubscript{2} & M\\textsubscript{12} \\\\\n")
+cat("\\midrule\n")
+
+# Generate table rows
+for (i in 1:nrow(table_data_gof)) {
+  row <- table_data_gof[i, ]
+  # Escape underscores in PDB chain ID for LaTeX
+  pdb_escaped <- gsub("_", "\\\\_", row$pdb_chain_id)
+
+  cat(sprintf("%s & %s & %s & %s & %s & %s & %s & %s & %s & %s & %s & %s & %s & %s & %s & %s \\\\\n",
+              row$mcsa_id,
+              pdb_escaped,
+              row$prop_dactive,
+              row$best_model,
+              row$aic.fit1,
+              row$aic.fit2,
+              row$aic.fit12,
+              row$dev.expl.fit1,
+              row$dev.expl.fit2,
+              row$dev.expl.fit12,
+              row$rmse_lrmsf.fit1,
+              row$rmse_lrmsf.fit2,
+              row$rmse_lrmsf.fit12,
+              row$rmse_dactive.fit1,
+              row$rmse_dactive.fit2,
+              row$rmse_dactive.fit12))
+}
+
+cat("\\bottomrule\n")
+cat("\\end{tabular}\n")
+cat("\\begin{flushleft}\n")
+cat("\\small\n")
+cat("RSC(s\\textsubscript{2}): relative Shapley contribution of functional constraints to structural divergence; Best: model with lowest AIC; Expl. Dev.: deviance explained by each model; RMSE(flex): root mean square error between observed and predicted divergence-flexibility trends; RMSE(dist): RMSE between observed and predicted divergence-distance trends.\n")
+cat("\\end{flushleft}\n")
+cat("\\end{table}\n")
+```
+
+\clearpage
+
+\beginsection
+
+# Robustness analysis
+
+To assess the robustness of our results, we tested whether the model performance metrics are sensitive to methodological choices. Specifically, we examined robustness with respect to: (1) reference protein choice, comparing results when using the reference protein (ca\_ref) versus the structurally closest homolog (ca\_hom, selected based on lowest overall RMSD to reduce artifacts from gaps and non-evolutionary structural differences); and (2) atom choice, comparing results when using C$\alpha$ atoms (ca\_ref) versus C$\beta$ atoms (cb\_ref) for structural calculations.
+
+Results show that the choice of reference protein has minimal impact: goodness-of-fit metrics exhibit strong correlations between the two approaches, and average values are nearly identical, confirming robustness to this methodological choice. In contrast, while C$\alpha$- and C$\beta$-based analyses show significant correlations, the correlations are weaker and C$\beta$-based analyses consistently yield lower goodness-of-fit values across all metrics, supporting our choice to use C$\alpha$ atoms for the main analyses.
+
+\clearpage
+
+```{r robustness-protein, fig.width=7.5, fig.height=10, fig.cap="Robustness to reference protein choice. Each panel compares goodness-of-fit metrics between analyses using the reference protein (ca\\_ref) and a homolog (ca\\_hom). (a) Deviance explained for models M1, M2, and M12. (b) RMSE between observed and predicted divergence-flexibility trends. (c) RMSE between observed and predicted divergence-distance trends. (d) Shapley contributions: SC(flex), SC(dist), and RSC(dist)."}
+knitr::include_graphics(here("supplementary/figures", "robustness_protein_choice.pdf"))
+```
+
+\clearpage
+
+```{r robustness-atom, fig.width=7.5, fig.height=10, fig.cap="Robustness to atom choice. Each panel compares goodness-of-fit metrics between analyses using C$\\alpha$ atoms (CA) and C$\\beta$ atoms (CB). (a) Deviance explained for models M1, M2, and M12. (b) RMSE between observed and predicted divergence-flexibility trends. (c) RMSE between observed and predicted divergence-distance trends. (d) Shapley contributions: SC(flex), SC(dist), and RSC(dist)."}
+knitr::include_graphics(here("supplementary/figures", "robustness_atom_choice.pdf"))
+```
+
+\clearpage
+
+\beginsection
+
+# Active site conservation
+
+We analyze structural divergence at active site residues ($d = 0$). For each family, divergence metrics are family-normalized, and M\textsubscript{12} predictions are decomposed into per-residue $s_1$ (non-functional constraint) and $s_2$ (functional constraint) contributions. For each active site residue, we calculate the relative magnitude $rs_1 = |s_1|/(|s_1|+|s_2|)$ and $rs_2 = |s_2|/(|s_1|+|s_2|)$. The values reported in the tables below ($s_1$, $s_2$, $rs_1$, $rs_2$) are the means of these per-residue metrics over all active site residues within each family.
+
+\clearpage
+
+```{r asite_summary_table, results='asis'}
+# Load profiles data
+profiles <- read_csv(here("data", "final_dataset_profiles_ca_ref.csv")) %>%
+  mutate(mcsa_id = as.character(mcsa_id))
+
+# Calculate family-level active site metrics (excluding case 749)
+family_values <- profiles %>%
+  filter(mcsa_id != "749") %>%
+  group_by(mcsa_id) %>%
+  mutate(
+    s1 = lrmsd.fit12.c1 - mean(lrmsd.fit12.c1, na.rm = TRUE),
+    s2 = lrmsd.fit12.c2 - mean(lrmsd.fit12.c2, na.rm = TRUE),
+    nlrmsf = lrmsf - mean(lrmsf, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  filter(near(dactive, 0)) %>%
+  mutate(
+    abs_sum = abs(s1) + abs(s2),
+    prop_s1 = abs(s1) / abs_sum,
+    prop_s2 = abs(s2) / abs_sum
+  ) %>%
+  group_by(mcsa_id) %>%
+  summarize(
+    Observed = mean(nlrmsd, na.rm = TRUE),
+    M12 = mean(nlrmsd.fit12, na.rm = TRUE),
+    s1 = mean(s1, na.rm = TRUE),
+    s2 = mean(s2, na.rm = TRUE),
+    rs1 = mean(prop_s1, na.rm = TRUE),
+    rs2 = mean(prop_s2, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Calculate summary statistics
+summary_stats <- tibble(
+  Statistic = c("Mean", "SD", "Min", "Max"),
+  Obs = c(
+    sprintf("%.2f", mean(family_values$Observed)),
+    sprintf("%.2f", sd(family_values$Observed)),
+    sprintf("%.2f", min(family_values$Observed)),
+    sprintf("%.2f", max(family_values$Observed))
+  ),
+  M12 = c(
+    sprintf("%.2f", mean(family_values$M12)),
+    sprintf("%.2f", sd(family_values$M12)),
+    sprintf("%.2f", min(family_values$M12)),
+    sprintf("%.2f", max(family_values$M12))
+  ),
+  s1 = c(
+    sprintf("%.2f", mean(family_values$s1)),
+    sprintf("%.2f", sd(family_values$s1)),
+    sprintf("%.2f", min(family_values$s1)),
+    sprintf("%.2f", max(family_values$s1))
+  ),
+  s2 = c(
+    sprintf("%.2f", mean(family_values$s2)),
+    sprintf("%.2f", sd(family_values$s2)),
+    sprintf("%.2f", min(family_values$s2)),
+    sprintf("%.2f", max(family_values$s2))
+  ),
+  rs1 = c(
+    sprintf("%.2f", mean(family_values$rs1)),
+    sprintf("%.2f", sd(family_values$rs1)),
+    sprintf("%.2f", min(family_values$rs1)),
+    sprintf("%.2f", max(family_values$rs1))
+  ),
+  rs2 = c(
+    sprintf("%.2f", mean(family_values$rs2)),
+    sprintf("%.2f", sd(family_values$rs2)),
+    sprintf("%.2f", min(family_values$rs2)),
+    sprintf("%.2f", max(family_values$rs2))
+  )
+)
+
+# Generate LaTeX table
+cat("\\begin{table}[htbp]\n")
+cat("\\caption{Summary statistics for active site divergence}\n")
+cat("\\small\n")
+cat("\\centering\n")
+cat("\\setlength{\\tabcolsep}{3pt}\n")
+cat("\\renewcommand{\\arraystretch}{1.2}\n")
+cat("\\begin{tabular}{lr@{\\hspace{4pt}}r@{\\hspace{12pt}}r@{\\hspace{4pt}}r@{\\hspace{12pt}}r@{\\hspace{4pt}}r}\n")
+cat("\\toprule\n")
+cat("Statistic & Obs & $M_{12}$ & $s_1$ & $s_2$ & $rs_1$ & $rs_2$ \\\\\n")
+cat("\\midrule\n")
+
+# Generate table rows
+for (i in 1:nrow(summary_stats)) {
+  row <- summary_stats[i, ]
+  cat(sprintf("%s & %s & %s & %s & %s & %s & %s \\\\\n",
+              row$Statistic,
+              row$Obs,
+              row$M12,
+              row$s1,
+              row$s2,
+              row$rs1,
+              row$rs2))
+}
+
+cat("\\bottomrule\n")
+cat("\\end{tabular}\n")
+cat("\\begin{flushleft}\n")
+cat("\\small\n")
+cat("Obs: observed nlRMSD; $M_{12}$: predicted nlRMSD; $s_1$: non-functional constraint contribution; $s_2$: functional constraint contribution; $rs_1$, $rs_2$: relative magnitude contributions. Statistics calculated across 33 enzyme families (case 749 excluded). All values are family-averaged active site metrics ($d = 0$).\n")
+cat("\\end{flushleft}\n")
+cat("\\label{tab:asite_summary}\n")
+cat("\\end{table}\n")
+```
+
+\clearpage
+
+```{r asite_families_table, results='asis'}
+# Calculate per-family active site metrics (reusing profiles data from previous chunk)
+family_table <- profiles %>%
+  filter(mcsa_id != "749") %>%
+  group_by(mcsa_id) %>%
+  mutate(
+    s1 = lrmsd.fit12.c1 - mean(lrmsd.fit12.c1, na.rm = TRUE),
+    s2 = lrmsd.fit12.c2 - mean(lrmsd.fit12.c2, na.rm = TRUE),
+    nlrmsf = lrmsf - mean(lrmsf, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  filter(near(dactive, 0)) %>%
+  mutate(
+    abs_sum = abs(s1) + abs(s2),
+    prop_s1 = abs(s1) / abs_sum,
+    prop_s2 = abs(s2) / abs_sum
+  ) %>%
+  group_by(mcsa_id) %>%
+  summarize(
+    Observed = mean(nlrmsd, na.rm = TRUE),
+    M12 = mean(nlrmsd.fit12, na.rm = TRUE),
+    s1 = mean(s1, na.rm = TRUE),
+    s2 = mean(s2, na.rm = TRUE),
+    rs1 = mean(prop_s1, na.rm = TRUE),
+    rs2 = mean(prop_s2, na.rm = TRUE),
+    mean_nlrmsf = mean(nlrmsf, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  left_join(data_gof %>% select(mcsa_id, shapley_lrmsf, shapley_dactive), by = "mcsa_id") %>%
+  mutate(
+    SC_s1 = shapley_lrmsf,
+    SC_s2 = shapley_dactive,
+    RSC_s2 = shapley_dactive / (shapley_lrmsf + shapley_dactive)
+  ) %>%
+  arrange(RSC_s2) %>%
+  mutate(
+    SC_s1 = sprintf("%.2f", SC_s1),
+    SC_s2 = sprintf("%.2f", SC_s2),
+    RSC_s2 = sprintf("%.2f", RSC_s2),
+    mean_nlrmsf = sprintf("%.2f", mean_nlrmsf),
+    Observed = sprintf("%.2f", Observed),
+    M12 = sprintf("%.2f", M12),
+    s1 = sprintf("%.2f", s1),
+    s2 = sprintf("%.2f", s2),
+    rs1 = sprintf("%.2f", rs1),
+    rs2 = sprintf("%.2f", rs2)
+  )
+
+# Generate LaTeX table
+cat("\\begin{table}[htbp]\n")
+cat("\\caption{Active site structural divergence and constraint contributions}\n")
+cat("\\small\n")
+cat("\\centering\n")
+cat("\\setlength{\\tabcolsep}{3pt}\n")
+cat("\\renewcommand{\\arraystretch}{1.1}\n")
+cat("\\begin{tabular}{lr@{\\hspace{4pt}}r@{\\hspace{4pt}}r@{\\hspace{15pt}}r@{\\hspace{12pt}}r@{\\hspace{4pt}}r@{\\hspace{12pt}}r@{\\hspace{4pt}}r@{\\hspace{12pt}}r@{\\hspace{4pt}}r}\n")
+cat("\\toprule\n")
+cat(" & \\multicolumn{3}{c}{Whole-protein} & \\multicolumn{7}{c}{Active site} \\\\\n")
+cat("\\cmidrule(lr){2-4} \\cmidrule(lr){5-11}\n")
+cat("M-CSA & SC($s_1$) & SC($s_2$) & RSC($s_2$) & nlRMSF & Obs & $M_{12}$ & $s_1$ & $s_2$ & $rs_1$ & $rs_2$ \\\\\n")
+cat("\\midrule\n")
+
+# Generate table rows
+for (i in 1:nrow(family_table)) {
+  row <- family_table[i, ]
+  cat(sprintf("%s & %s & %s & %s & %s & %s & %s & %s & %s & %s & %s \\\\\n",
+              row$mcsa_id,
+              row$SC_s1,
+              row$SC_s2,
+              row$RSC_s2,
+              row$mean_nlrmsf,
+              row$Observed,
+              row$M12,
+              row$s1,
+              row$s2,
+              row$rs1,
+              row$rs2))
+}
+
+cat("\\bottomrule\n")
+cat("\\end{tabular}\n")
+cat("\\begin{flushleft}\n")
+cat("\\small\n")
+cat("Values represent family-averaged metrics for active site residues ($d = 0$). Obs: observed nlRMSD; $M_{12}$: predicted nlRMSD; $s_1$: non-functional constraint contribution; $s_2$: functional constraint contribution; $rs_1$, $rs_2$: relative magnitude contributions; SC($s_1$), SC($s_2$): Shapley constraint contributions (whole-family level); RSC($s_2$): relative Shapley contribution of $s_2$; nlRMSF: mean normalized flexibility at active site. Case 749 excluded as outlier. Families sorted by RSC($s_2$).\n")
+cat("\\end{flushleft}\n")
+cat("\\label{tab:asite_families}\n")
+cat("\\end{table}\n")
+```
+
+\clearpage
+
+```{r asite-correlations, fig.width=8, fig.height=7, fig.cap="Active site constraint correlations. (a) Relationship between active site non-functional constraint contribution ($s_1$) and active site flexibility (nlRMSF). (b) Relationship between active site functional constraint contribution ($s_2$) and whole-protein Shapley contribution SC($s_2$). (c) Relationship between active site relative non-functional contribution ($rs_1$) and active site flexibility. (d) Relationship between active site relative non-functional contribution ($rs_1$) and whole-protein Shapley contribution SC($s_2$). All metrics are family-averaged over active site residues ($d = 0$). Lines show linear regression fits with 95\\% confidence intervals. Correlation statistics displayed on each panel."}
+knitr::include_graphics(here("supplementary/figures", "asite_correlations.pdf"))
+```
+
+\clearpage
+
+\beginsection
+
+# Family by family analysis
+
+Each figure in this section represents a structural divergence analysis for a specific enzyme family, identified by its MCSA ID. 
+
+Each figure is organized as follows:
+
+Observed patterns:
+(a) Residue-specific structural divergence profile, showing normalized log-RMSD (nlRMSD) across residues.
+(b) Relationship between structural divergence (nlRMSD) and residue flexibility (nlRMSF).
+(c) Relationship between structural divergence (nlRMSD) and distance from the active site (d).
+
+Model predictions vs. observations:
+(d) Comparison of observed nlRMSD profile with predictions from models M1, M2, and M12.
+(e) Flexibility trends: observed data vs. model predictions for nlRMSD vs. nlRMSF.
+(f) Distance trends: observed data vs. model predictions for nlRMSD vs. d.
+
+Decomposition into flexibility and distance contributions:
+(g) Profile of structural divergence decomposed into flexibility (s1) and distance (s2) components.
+(h) Flexibility (s1) component of structural divergence.
+(i) Distance (s2) component of structural divergence.
+
+```{r generate-case-figures, results='asis', fig.show='asis'}
+# List of all mcsa_ids to process
+d <- data_gof %>%
+  arrange(as.numeric(mcsa_id))
+mcsa_ids <- d$mcsa_id
+
+# Include all case-by-case figures
+for (id in mcsa_ids) {
+  cat("\n\n\\clearpage\n")
+  cat("\\begin{figure}[H]\n\\centering\n")
+
+  # Include pre-generated figure
+  fig_path <- here("supplementary/figures", sprintf("case_%s.pdf", id))
+  cat(sprintf("\\includegraphics[width=6.5in]{%s}\n", fig_path))
+
+  # Get the PDB chain ID for this MCSA ID
+  pdb_chain_id <- dataset %>%
+    filter(mcsa_id == id) %>%
+    pull(pdb_chain_id)
+
+  # Escape the underscore in the PDB chain ID for LaTeX
+  pdb_chain_id_escaped <- gsub("_", "\\\\_", pdb_chain_id)
+
+  # Add a caption with MCSA ID and escaped PDB chain ID
+  cat(sprintf("\\caption{Structural divergence analysis for enzyme family MCSA ID: %s. Reference protein PDB ID: %s.}\n", id, pdb_chain_id_escaped))
+  cat("\\end{figure}\n")
+}
+```

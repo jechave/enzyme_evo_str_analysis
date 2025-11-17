@@ -1,0 +1,29 @@
+\begin{table}[htbp]
+\small
+\centering
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{llrrr}
+\toprule
+Metric & Model & ca\_ref & ca\_hom & CB \\
+\midrule
+\textbf{Dev.Expl.} & M\textsubscript{1} & 0.42$\pm$0.14 & 0.41$\pm$0.12 & 0.37$\pm$0.15 \\
+ & M\textsubscript{2} & 0.28$\pm$0.13 & 0.26$\pm$0.13 & 0.23$\pm$0.13 \\
+ & M\textsubscript{12} & 0.49$\pm$0.13 & 0.48$\pm$0.12 & 0.41$\pm$0.15 \\
+\addlinespace
+\textbf{RMSE(flex)} & M\textsubscript{1} & 0.05$\pm$0.02 & 0.06$\pm$0.03 & 0.06$\pm$0.03 \\
+ & M\textsubscript{2} & 0.29$\pm$0.12 & 0.29$\pm$0.10 & 0.27$\pm$0.11 \\
+ & M\textsubscript{12} & 0.05$\pm$0.02 & 0.06$\pm$0.03 & 0.06$\pm$0.02 \\
+\addlinespace
+\textbf{RMSE(dist)} & M\textsubscript{1} & 0.18$\pm$0.09 & 0.17$\pm$0.09 & 0.16$\pm$0.08 \\
+ & M\textsubscript{2} & 0.07$\pm$0.05 & 0.07$\pm$0.04 & 0.08$\pm$0.05 \\
+ & M\textsubscript{12} & 0.08$\pm$0.06 & 0.08$\pm$0.05 & 0.09$\pm$0.07 \\
+\addlinespace
+\textbf{Shapley} & SC(flex) & 0.31$\pm$0.12 & 0.31$\pm$0.10 & 0.28$\pm$0.11 \\
+ & SC(dist) & 0.18$\pm$0.10 & 0.17$\pm$0.10 & 0.14$\pm$0.08 \\
+ & RSC(dist) & 0.36$\pm$0.18 & 0.33$\pm$0.18 & 0.36$\pm$0.33 \\
+\bottomrule
+\end{tabular}
+\caption{Robustness of goodness-of-fit metrics to methodological choices. Values show mean $\pm$ standard deviation across 53 enzyme families. ca\_ref: reference protein with CA atoms; ca\_hom: closest homolog with CA atoms; CB: reference protein with CB atoms. High consistency across methods indicates robustness. See Supplementary Figures for detailed scatter plots and correlations.}
+\label{tab:robustness}
+\end{table}
